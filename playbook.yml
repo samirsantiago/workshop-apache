@@ -1,0 +1,36 @@
+---
+- name: Install httpd with index.html Custom and gather the service are started and enabled 
+  hosts: all 
+  tasks: 
+
+    - name: Install Apache WebServer
+      yum:
+        name: httpd
+        state: latest 
+
+    - name: Gathering Custom index.html
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+      notify: restart httpd  
+   
+
+    - name: Gathering httpd is started 
+      service:
+        name: httpd
+        state: started
+        enabled: yes    
+
+    - name: Gathering httpd port is Open
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes 
+
+
+  handlers:
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted
